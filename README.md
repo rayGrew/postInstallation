@@ -44,4 +44,4 @@ Incluye detección profunda de software ya instalado, instalación con **winget*
    Set-ExecutionPolicy RemoteSigned -Scope Process
 4. Ejecución:
    ```powershell
-   .\install_menu.ps1
+   .\install_apps.ps1
