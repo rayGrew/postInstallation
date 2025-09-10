@@ -82,6 +82,33 @@ $Catalog = @{
     )
     KnownPaths  = @()
   }
+  
+  "Adobe Acrobat Reader" = @{
+    MatchNames  = @("Adobe Acrobat Reader","Acrobat Reader","Adobe Reader")
+    InstallPlan = @(@{ Source="winget"; Id="Adobe.Acrobat.Reader.64-bit"; Name="Adobe Acrobat Reader" })
+    KnownPaths  = @(
+      "$env:ProgramFiles\Adobe\Acrobat Reader\Reader\AcroRd32.exe",
+      "$env:ProgramFiles\Adobe\Acrobat Reader DC\Reader\AcroRd32.exe",
+      "$env:ProgramFiles(x86)\Adobe\Acrobat Reader DC\Reader\AcroRd32.exe"
+    )
+  }
+  "Google Chrome" = @{
+    MatchNames  = @("Google Chrome","Chrome")
+    InstallPlan = @(@{ Source="winget"; Id="Google.Chrome"; Name="Google Chrome" })
+    KnownPaths  = @(
+      "$env:ProgramFiles\Google\Chrome\Application\chrome.exe",
+      "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe"
+    )
+  }
+
+  "AnyDesk" = @{
+    MatchNames  = @("AnyDesk")
+    InstallPlan = @(@{ Source="winget"; Id="AnyDeskSoftwareGmbH.AnyDesk"; Name="AnyDesk" })
+    KnownPaths  = @(
+      "$env:ProgramFiles (x86)\AnyDesk\AnyDesk.exe",
+      "$env:ProgramFiles\AnyDesk\AnyDesk.exe"
+    )
+  }
 
   # Dev
   "Visual Studio Code" = @{
@@ -135,6 +162,32 @@ $Catalog = @{
     MatchNames  = @("Docker Desktop")
     InstallPlan = @(@{ Source="winget"; Id="Docker.DockerDesktop"; Name="Docker Desktop" })
     KnownPaths  = @("$env:ProgramFiles\Docker\Docker\Docker Desktop.exe")
+  }
+  
+  # Portafolio
+  "IBKR Desktop" = @{
+    MatchNames  = @("IBKR Desktop","Interactive Brokers Desktop","Trader Workstation","TWS")
+    InstallPlan = @(
+      # IBKR Desktop / TWS (enlace oficial para Windows de IBKR)
+      @{ Source="direct"; Url="https://download2.interactivebrokers.com/installers/ntws/latest-standalone/ntws-latest-standalone-windows-x64.exe"; SilentArgs=""; Name="IBKR Desktop" }
+    )
+    KnownPaths  = @(
+      "C:\Jts\tws.exe",                      # TWS típico
+      "C:\Program Files\IBKR Desktop\IBKR Desktop.exe" # ruta probable si cambia el nombre del ejecutable
+    )
+  }
+
+  "XTB xStation 5" = @{
+    MatchNames  = @("XTB","xStation","xStation 5","XTB xStation")
+    InstallPlan = @(
+      # Instalador oficial de XTB para Windows
+      @{ Source="direct"; Url="https://xstation.xtb.com/desktop/XTB%20xStation.exe"; SilentArgs="/S"; Name="XTB xStation 5" }
+    )
+    KnownPaths  = @(
+      "$env:ProgramFiles\XTB xStation\xStation.exe",
+      "$env:ProgramFiles\XTB\xStation 5\xStation.exe",
+      "$env:LOCALAPPDATA\Programs\XTB xStation\xStation.exe"
+    )
   }
 }
 
@@ -323,19 +376,43 @@ Write-Host ""
 Write-Host "Seleccione el tipo de instalación:" -ForegroundColor Cyan
 Write-Host "  1) General  (Microsoft 365 Apps + Zoom)"
 Write-Host "  2) Dev W11  (General + VSCode, Cursor, Zen, Thunderbird, SSMS, Termius, API client, Docker)"
-$choice = Read-Host "Ingrese 1 o 2"
+Write-Host "  3) Portafolio  (General + IBKR Desktop + XTB xStation 5)"
+$choice = Read-Host "Ingrese 1, 2 o 3"
 
 switch ($choice) {
-  "1" { $selection = @("Microsoft 365 Apps","Zoom"); Write-Host "`n→ Opción 'General' seleccionada." -ForegroundColor Green }
+  "1" {
+    $selection = @(
+      "Microsoft 365 Apps",
+      "Zoom",
+      "Adobe Acrobat Reader",
+      "Google Chrome",
+      "AnyDesk"
+    )
+    Write-Host "`n→ Opción 'General' seleccionada." -ForegroundColor Green
+  }
   "2" {
     Write-Host "`nCliente API:" -ForegroundColor Cyan
     Write-Host "  1) Postman"; Write-Host "  2) Insomnia"
     $apiChoice = Read-Host "Ingrese 1 o 2"
     $apiTool = if ($apiChoice -eq "2") { "Insomnia" } else { "Postman" }
-    $selection = @("Microsoft 365 Apps","Zoom","Visual Studio Code","Cursor","Zen Browser","Thunderbird","SSMS","Termius",$apiTool,"Docker Desktop")
+    $selection = @(
+      "Microsoft 365 Apps","Zoom","Adobe Acrobat Reader","Google Chrome","AnyDesk",
+      "Visual Studio Code","Cursor","Zen Browser","Thunderbird","SSMS","Termius",$apiTool,"Docker Desktop"
+    )
     Write-Host "`n→ Opción 'Dev W11' seleccionada (API: $apiTool)." -ForegroundColor Green
   }
-  Default { Write-Log "Entrada inválida" "WARN"; Exit-Ok "OK: Entrada inválida, operación cancelada por el usuario." }
+  "3" {
+    # Portafolio = todo lo de General + IBKR + XTB
+    $selection = @(
+      "Microsoft 365 Apps","Zoom","Adobe Acrobat Reader","Google Chrome","AnyDesk",
+      "IBKR Desktop","XTB xStation 5"
+    )
+    Write-Host "`n→ Opción 'Portafolio' seleccionada." -ForegroundColor Green
+  }
+  Default {
+    Write-Log "Entrada inválida" "WARN"
+    Exit-Ok "OK: Entrada inválida, operación cancelada por el usuario."
+  }
 }
 
 # ===== Escaneo previo =====
